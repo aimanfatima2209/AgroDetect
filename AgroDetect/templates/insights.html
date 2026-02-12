@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Model Insights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<header class="main-header">
+    <div class="header-left">
+        🌿 <strong>AgroDetect AI</strong>
+    </div>
+    <nav class="header-nav">
+        <a href="/">Home</a>
+        <a href="/report">Report</a>
+        <a href="/insights">Insights</a>
+        <a href="/chatbot">Chatbot</a>
+    </nav>
+</header>
+
+<div class="dashboard-container">
+
+    <h1 class="center-title">📊 Model Performance Dashboard</h1>
+
+    <div class="dashboard-grid">
+
+        <!-- Training Graph -->
+        <div class="dashboard-card">
+            <h2>Training Accuracy Curve</h2>
+            <canvas id="accuracyChart"></canvas>
+        </div>
+
+        <!-- Model Info -->
+        <div class="report-section">
+            <h2>📊 Model Evaluation & Architecture</h2>
+
+            <!-- Architecture -->
+            <h3 style="margin-top:30px;">🧠 Model Architecture</h3>
+            <img src="{{ url_for('static', filename='images/model_architecture.png') }}"
+                class="insight-img">
+
+            <div class="insight-text">
+                <p><strong>Base Model:</strong> MobileNetV2 (ImageNet Pretrained)</p>
+                <p><strong>Transfer Learning:</strong> Final classifier modified to 9 disease classes</p>
+                <p><strong>Input Size:</strong> 224 × 224 RGB</p>
+                <p><strong>Loss Function:</strong> CrossEntropyLoss</p>
+                <p><strong>Optimizer:</strong> Adam</p>
+            </div>
+
+            <!-- Confusion Matrix -->
+            <h3 style="margin-top:50px;">📈 Confusion Matrix</h3>
+            <img src="{{ url_for('static', filename='images/confusion_matrix.png') }}" class="insight-img">
+        </div>
+
+
+    </div>
+
+    <div class="report-buttons">
+    <a href="/report" class="btn">🔙 Back to Report</a>
+    <a href="/" class="btn secondary">🏠 Back to Home</a>
+</div>
+
+
+</div>
+
+<script>
+const ctx = document.getElementById('accuracyChart').getContext('2d');
+
+const gradientTrain = ctx.createLinearGradient(0, 0, 0, 400);
+gradientTrain.addColorStop(0, "rgba(74, 222, 128, 0.6)");
+gradientTrain.addColorStop(1, "rgba(74, 222, 128, 0.05)");
+
+const gradientVal = ctx.createLinearGradient(0, 0, 0, 400);
+gradientVal.addColorStop(0, "rgba(59, 130, 246, 0.6)");
+gradientVal.addColorStop(1, "rgba(59, 130, 246, 0.05)");
+
+new Chart(ctx, {
+    type: 'line',
+    data: {
+        labels: [
+            'Epoch 1','Epoch 2','Epoch 3','Epoch 4','Epoch 5',
+            'Epoch 6','Epoch 7','Epoch 8','Epoch 9','Epoch 10'
+        ],
+        datasets: [
+            {
+                label: 'Training Accuracy',
+                data: [82, 88, 91, 93, 94.5, 95.2, 95.8, 96.1, 96.4, 96.6],
+                borderColor: '#4ade80',
+                backgroundColor: gradientTrain,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: '#4ade80'
+            },
+            {
+                label: 'Validation Accuracy',
+                data: [80, 86, 90, 92, 93.5, 94.2, 94.8, 95.1, 95.4, 95.7],
+                borderColor: '#3b82f6',
+                backgroundColor: gradientVal,
+                tension: 0.4,
+                fill: true,
+                pointRadius: 4,
+                pointBackgroundColor: '#3b82f6'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        animation: {
+            duration: 2000,
+            easing: 'easeOutQuart'
+        },
+        plugins: {
+            legend: {
+                labels: {
+                    color: 'white',
+                    font: { size: 14 }
+                }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255,255,255,0.05)' }
+            },
+            y: {
+                min: 75,
+                max: 100,
+                ticks: { color: 'white' },
+                grid: { color: 'rgba(255,255,255,0.05)' }
+            }
+        }
+    }
+});
+</script>
+<footer class="main-footer">
+    <p><strong>AgroDetect AI</strong> © 2026</p>
+    <p>AI-Powered Crop Disease Diagnosis | Built for Hackathon</p>
+    <p class="project-credit">Project by <strong>Amogha Vyshnavi Aiman</strong></p>
+</footer>
+
+</body>
+</html>

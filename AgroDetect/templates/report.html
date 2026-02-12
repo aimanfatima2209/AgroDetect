@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Diagnosis Report</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+<body>
+<header class="main-header">
+    <div class="header-left">
+        🌿 <strong>AgroDetect AI</strong>
+    </div>
+    <nav class="header-nav">
+        <a href="/">Home</a>
+        <a href="/report">Report</a>
+        <a href="/insights">Insights</a>
+        <a href="/chatbot">Chatbot</a>
+    </nav>
+</header>
+
+<div class="container">
+
+    <div class="report-page">
+    <div class="container">
+        <h1 class="center-title">🌿 Detailed Diagnosis Report</h1>
+
+    {% if data %}
+
+    <div class="report-layout">
+
+        <!-- LEFT SIDE -->
+        <div class="left-panel">
+            <h3>📸 Uploaded Image</h3>
+            <div class="image-wrapper">
+                <img src="{{ data.image_path }}" class="uploaded-image">
+            </div>
+            <div class="disease-name">
+                <h2>{{ data.prediction }}</h2>
+            </div>
+        </div>
+
+        <!-- RIGHT SIDE -->
+        <div class="right-panel">
+
+            <div class="report-card">
+                <p><strong>Confidence:</strong> {{ data.confidence }}%</p>
+
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: {{ data.confidence }}%;"></div>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h3>🔍 What Was Detected?</h3>
+                <p>{{ data.explanation }}</p>
+            </div>
+
+            <div class="report-section">
+                <h3>💊 Recommended Treatment</h3>
+                <p>{{ data.treatment }}</p>
+            </div>
+
+            <div class="report-section">
+                <h3>⚠ Severity Level</h3>
+                <p class="severity {{ data.severity|lower }}">
+                    {{ data.severity }}
+                </p>
+            </div>
+            <div class="report-section">
+                <h3>📊 Model Confidence Distribution</h3>
+                <canvas id="confidenceChart"></canvas>
+            </div>
+
+
+
+            <div class="report-buttons">
+                <a href="/explainability" class="btn">🔬 View Explainability</a>
+                <a href="/chatbot" class="btn">🤖 Ask AI Assistant</a>
+                <a href="/insights" class="btn">📊 View Model Insights</a>
+                <a href="/" class="btn secondary">🔄 New Scan</a>
+                <a href="/download_report" class="btn">📄 Download PDF Report</a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+</div>
+</div>
+</div>
+<script>
+    const labels = {{ data.probabilities_labels | default([]) | tojson }};
+    const values = {{ data.probabilities_values | default([]) | tojson }};
+
+    if (labels.length > 0 && values.length > 0) {
+
+        const ctx = document.getElementById('confidenceChart').getContext('2d');
+
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Confidence (%)',
+                    data: values,
+                    backgroundColor: 'rgba(74, 222, 128, 0.8)',
+                    borderColor: '#4ade80',
+                    borderWidth: 2,
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: 'white',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ticks: {
+                            color: 'white',
+                            font: {
+                                size: 13,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)'
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        max: 100,
+                        ticks: {
+                            color: 'white',
+                            font: {
+                                size: 13,
+                                weight: 'bold'
+                            }
+                        },
+                        grid: {
+                            color: 'rgba(255,255,255,0.1)'
+                        }
+                    }
+                }
+            }
+        });
+
+    } else {
+        console.log("No probability data available.");
+    }
+</script>
+
+
+<footer class="main-footer">
+    <p><strong>AgroDetect AI</strong> © 2026</p>
+    <p>AI-Powered Crop Disease Diagnosis | Built for Hackathon</p>
+    <p class="project-credit">Project by <strong>Amogha Vyshnavi Aiman</strong></p>
+</footer>
+
+</body>
+</html>

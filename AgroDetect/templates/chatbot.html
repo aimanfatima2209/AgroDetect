@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Crop Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+<header class="main-header">
+    <div class="header-left">
+        🌿 <strong>AgroDetect AI</strong>
+    </div>
+    <nav class="header-nav">
+        <a href="/">Home</a>
+        <a href="/report">Report</a>
+        <a href="/insights">Insights</a>
+        <a href="/chatbot">Chatbot</a>
+    </nav>
+</header>
+
+<div class="dashboard-container">
+
+    {% if session.get("prediction_data") %}
+    {% set disease = session.get("prediction_data").prediction.replace("_", " ") %}
+    <h1 class="center-title">
+        🤖 AI Advisor – {{ disease }}
+    </h1>
+    {% else %}
+        <h1 class="center-title">🤖 AI Crop Assistant</h1>
+    {% endif %}
+    <p style="text-align:center; color:#cbd5e1;">
+        Ask detailed questions about diagnosis, treatment, prevention, and soil management.
+    </p>
+
+    <div class="chat-container" id="chatBox">
+        <div class="bot-message">Hello! Ask me about your plant diagnosis.</div>
+    </div>
+    <div class="suggested-questions">
+        <p>Suggested Questions:</p>
+
+        {% if severity == "high" or severity == "moderate" %}
+            <button onclick="quickAsk('What immediate action should I take?')">🚨 Emergency Action Plan</button>
+            <button onclick="quickAsk('How severe is this infection?')">📊 Severity Analysis</button>
+            <button onclick="quickAsk('How can I stop this from spreading?')">🛑 Stop Spread</button>
+            <button onclick="quickAsk('What treatment should I start now?')">💊 Treatment Plan</button>
+            <button onclick="quickAsk('How can I prevent further infection?')">🌱 Prevention Strategy</button>
+            <button onclick="quickAsk('Fertilizer advice?')">🌾 Soil & Fertilizer</button>
+
+        {% else %}
+            <button onclick="quickAsk('The prediction seems uncertain. What should I do?')">🔍 Recheck Guidance</button>
+            <button onclick="quickAsk('How can I capture a clearer image?')">📸 Image Tips</button>
+        {% endif %}
+    </div>
+
+
+    <div class="chat-input">
+        <input type="text" id="userInput" placeholder="Type your question...">
+        <button onclick="sendMessage()">Send</button>
+    </div>
+
+    <div style="text-align:center; margin-top:30px;">
+        <a href="/report" class="btn">⬅ Back to Report</a>
+    </div>
+
+</div>
+
+<script>
+function sendMessage() {
+    const input = document.getElementById("userInput");
+    const message = input.value;
+    if (!message) return;
+
+    const chatBox = document.getElementById("chatBox");
+
+    chatBox.innerHTML += `<div class="user-message">${message}</div>`;
+
+    fetch("/chat", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({message: message})
+    })
+    .then(res => res.json())
+    .then(data => {
+        chatBox.innerHTML += `<div class="bot-message"><pre>${data.reply}</pre></div>`;
+        chatBox.scrollTop = chatBox.scrollHeight;
+    });
+
+    input.value = "";
+}
+function quickAsk(question) {
+    document.getElementById("userInput").value = question;
+    sendMessage();
+}
+
+</script>
+<footer class="main-footer">
+    <p><strong>AgroDetect AI</strong> © 2026</p>
+    <p>AI-Powered Crop Disease Diagnosis | Built for Hackathon</p>
+    <p class="project-credit">Project by <strong>Amogha Vyshnavi Aiman</strong></p>
+</footer>
+
+</body>
+</html>
